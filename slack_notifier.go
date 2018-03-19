@@ -42,10 +42,11 @@ func (s *SlackNotifier) PostStatus(param *PostStatusParam) error {
 	var statusText, iconEmoji, userName, attachmentColor string
 	var successful bool
 
-	if param.ExpectedStatuscode == OKStatusCode {
-		successful = IsSuccessfulStatus(param.CurrentStatusCode)
-	} else {
+	hasExpected := param.ExpectedStatuscode != OKStatusCode
+	if hasExpected {
 		successful = param.CurrentStatusCode == param.ExpectedStatuscode
+	} else {
+		successful = IsSuccessfulStatus(param.CurrentStatusCode)
 	}
 
 	if successful {
@@ -64,6 +65,10 @@ func (s *SlackNotifier) PostStatus(param *PostStatusParam) error {
 statusCode: %d -> %d
 responseTime: %f sec`
 	message := fmt.Sprintf(format, param.CheckURL, statusText, param.BeforeStatusCode, param.CurrentStatusCode, param.ResponseTime)
+
+	if hasExpected {
+		message += fmt.Sprintf("\nExpected: %d", param.ExpectedStatuscode)
+	}
 
 	if param.HTTPError != nil {
 		message += fmt.Sprintf("\nhttpError: %v", param.HTTPError)

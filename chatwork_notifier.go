@@ -33,10 +33,11 @@ func (c *ChatworkNotifier) PostStatus(param *PostStatusParam) error {
 	var statusText string
 	var successful bool
 
-	if param.ExpectedStatuscode == OKStatusCode {
-		successful = IsSuccessfulStatus(param.CurrentStatusCode)
-	} else {
+	hasExpected := param.ExpectedStatuscode != OKStatusCode
+	if hasExpected {
 		successful = param.CurrentStatusCode == param.ExpectedStatuscode
+	} else {
+		successful = IsSuccessfulStatus(param.CurrentStatusCode)
 	}
 
 	if successful {
@@ -49,6 +50,10 @@ func (c *ChatworkNotifier) PostStatus(param *PostStatusParam) error {
 	format := `statusCode: %d -> %d
 responseTime: %f sec`
 	body := fmt.Sprintf(format, param.BeforeStatusCode, param.CurrentStatusCode, param.ResponseTime)
+
+	if hasExpected {
+		body += fmt.Sprintf("\nExpected: %d", param.ExpectedStatuscode)
+	}
 
 	if param.HTTPError != nil {
 		body += fmt.Sprintf("\nhttpError: %v", param.HTTPError)
