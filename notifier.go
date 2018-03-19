@@ -1,11 +1,15 @@
 package main
 
+const OKStatusCode = -200
+
 // PostStatusParam represents request parameter for PostStatus
 type PostStatusParam struct {
-	CheckURL                            string
-	BeforeStatusCode, CurrentStatusCode int
-	HTTPError                           error
-	ResponseTime                        float64
+	CheckURL           string
+	BeforeStatusCode   int
+	CurrentStatusCode  int
+	ExpectedStatuscode int
+	HTTPError          error
+	ResponseTime       float64
 }
 
 // Notifier represents interface for generic notifier

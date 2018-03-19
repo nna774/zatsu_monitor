@@ -31,8 +31,13 @@ func (c *ChatworkNotifier) PostStatus(param *PostStatusParam) error {
 	chatwork := chatwork.NewClient(c.apiToken)
 
 	var statusText string
+	var successful bool
 
-	successful := IsSuccessfulStatus(param.CurrentStatusCode)
+	if param.ExpectedStatuscode == OKStatusCode {
+		successful = IsSuccessfulStatus(param.CurrentStatusCode)
+	} else {
+		successful = param.CurrentStatusCode == param.ExpectedStatuscode
+	}
 
 	if successful {
 		statusText = "ok (F)"

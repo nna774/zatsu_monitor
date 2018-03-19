@@ -40,8 +40,13 @@ func (s *SlackNotifier) ExpectedKeys() []string {
 // PostStatus perform posting current status for URL
 func (s *SlackNotifier) PostStatus(param *PostStatusParam) error {
 	var statusText, iconEmoji, userName, attachmentColor string
+	var successful bool
 
-	successful := IsSuccessfulStatus(param.CurrentStatusCode)
+	if param.ExpectedStatuscode == OKStatusCode {
+		successful = IsSuccessfulStatus(param.CurrentStatusCode)
+	} else {
+		successful = param.CurrentStatusCode == param.ExpectedStatuscode
+	}
 
 	if successful {
 		statusText = "ok"

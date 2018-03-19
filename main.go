@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -98,14 +99,23 @@ func perform(name string, values map[string]string) {
 		onlyCheckOnTheOrderOf100 = true
 	}
 
+	expected := OKStatusCode
+	if values["expected_status_code"] != "" {
+		expected, err = strconv.Atoi(values["expected_status_code"])
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	if isNotify(beforeStatusCode, currentStatusCode, onlyCheckOnTheOrderOf100) {
 		// When status code changes from the previous, notify
 		param := PostStatusParam{
-			CheckURL:          checkURL,
-			BeforeStatusCode:  beforeStatusCode,
-			CurrentStatusCode: currentStatusCode,
-			HTTPError:         httpError,
-			ResponseTime:      responseTime,
+			CheckURL:           checkURL,
+			BeforeStatusCode:   beforeStatusCode,
+			CurrentStatusCode:  currentStatusCode,
+			ExpectedStatuscode: expected,
+			HTTPError:          httpError,
+			ResponseTime:       responseTime,
 		}
 		notifier.PostStatus(&param)
 	}
